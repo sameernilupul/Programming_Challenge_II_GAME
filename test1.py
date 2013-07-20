@@ -1,5 +1,7 @@
 import pygame,sys
 from pygame.locals import *
+from GameObjects import Tank 
+#Parameters
 
 FPS = 30
 WIDTH = 1000
@@ -11,6 +13,9 @@ ENEMY_TANK = pygame.image.load('./Resources/Tank2.png')
 GRASS = pygame.image.load('./Resources/Grass.png')
 WATER = pygame.image.load('./Resources/Water.png')
 ROCK = pygame.image.load('./Resources/Rock.png')
+
+# initialization
+
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),0,32)
 pygame.display.set_caption('Tank Game')
@@ -20,13 +25,16 @@ cat = pygame.image.load('./Resources/Tank1.png')
 catx =100
 caty =100
 
+Player1 = Tank("Name", 100,0,0,MY_TANK)
+
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
 #pygame.mixer.music.play(-1,0.0)
 
+#main loop
 while True:
 	DISPLAYSURF.fill(WHITE)
-	DISPLAYSURF.blit(cat,(catx,caty))
+	DISPLAYSURF.blit(Player1.image,(catx,caty))
 	catx += 1
 	beep.play()
 	for event in pygame.event.get():
