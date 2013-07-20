@@ -5,6 +5,7 @@ class Tank(object):
 		self.pos_x = pos_x
 		self.pos_y = pos_y
 		self.image = image
+		self.speed = 1
 		
 		
 class BrickWall:
@@ -25,3 +26,10 @@ class Water:
 		self.pos_x = pos_x
 		self.pos_y = pos_y
 		self.image = image
+		
+class Bullet:
+	def __init__(self, pos_x = 0,pos_y = 0, image = None):
+		self.pos_x = pos_x
+		self.pos_y = pos_y
+		self.image = image
+		self.speed = 3
