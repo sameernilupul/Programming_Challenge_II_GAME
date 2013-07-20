@@ -13,6 +13,7 @@ fpsClock = pygame.time.Clock()
 NUM_PLAYERS = 5
 MY_TANK = pygame.image.load('./Resources/Tank1.png')
 ENEMY_TANK = pygame.image.load('./Resources/Tank2.png')
+FALCON = pygame.image.load('./Resources/Falcon.png')
 GRASS = pygame.image.load('./Resources/Grass.png')
 WATER = pygame.image.load('./Resources/Water.png')
 STONE = pygame.image.load('./Resources/Rock.png')
@@ -30,7 +31,7 @@ WHITE = (255,255,255)
 catx =100
 caty =100
 
-Player1 = Tank("Name", 100,0,0,ENEMY_TANK)
+Player1 = Tank("Name", 100,0,0,MY_TANK)
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
@@ -40,7 +41,6 @@ print ARENA
 #main loop
 init =0;
 while True:
-	
 	for x in range(0,20):
 		for y in range(0,20):
 			if ARENA[x*20+y] == 0: 							# Grass Land
