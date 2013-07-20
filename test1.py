@@ -21,11 +21,10 @@ DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),0,32)
 pygame.display.set_caption('Tank Game')
 
 WHITE = (255,255,255)
-cat = pygame.image.load('./Resources/Tank1.png')
 catx =100
 caty =100
 
-Player1 = Tank("Name", 100,0,0,MY_TANK)
+Player1 = Tank("Name", 100,0,0,ENEMY_TANK)
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
