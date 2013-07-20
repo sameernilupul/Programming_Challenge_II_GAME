@@ -3,18 +3,20 @@ from pygame.locals import *
 from GameObjects import Tank 
 from numpy import *
 from Arena import *
+from Calculations import *
 #Parameters
 
 FPS = 30
-WIDTH = 1000
-HEIGHT = 700
+WIDTH = 760
+HEIGHT = 760
 fpsClock = pygame.time.Clock()
 NUM_PLAYERS = 5
 MY_TANK = pygame.image.load('./Resources/Tank1.png')
 ENEMY_TANK = pygame.image.load('./Resources/Tank2.png')
 GRASS = pygame.image.load('./Resources/Grass.png')
 WATER = pygame.image.load('./Resources/Water.png')
-ROCK = pygame.image.load('./Resources/Rock.png')
+STONE = pygame.image.load('./Resources/Rock.png')
+BRICK = pygame.image.load('./Resources/Brick.png')
 ARENA = getInitialArena()[0]
 PLAYER = getInitialArena()[1]
 
@@ -36,8 +38,24 @@ beep = pygame.mixer.Sound('beeps.wav')
 
 print ARENA
 #main loop
+init =0;
 while True:
-	DISPLAYSURF.fill(WHITE)
+	
+	for x in range(0,20):
+		for y in range(0,20):
+			if ARENA[x*20+y] == 0: 							# Grass Land
+				coordinates = calculateTopLeftCoordinates(x,y, 760,760)
+				DISPLAYSURF.blit(GRASS,(coordinates[0],coordinates[1]))
+			if ARENA[x*20+y] == 1: 							# Brick Wall
+				coordinates = calculateTopLeftCoordinates(x,y, 760,760)
+				DISPLAYSURF.blit(BRICK,(coordinates[0],coordinates[1]))
+			if ARENA[x*20+y] == 2: 							# Stone Wall
+				coordinates = calculateTopLeftCoordinates(x,y, 760,760)
+				DISPLAYSURF.blit(STONE,(coordinates[0],coordinates[1]))
+			if ARENA[x*20+y] == 3: 							# Water
+				coordinates = calculateTopLeftCoordinates(x,y, 760,760)
+				DISPLAYSURF.blit(WATER,(coordinates[0],coordinates[1]))
+	
 	DISPLAYSURF.blit(Player1.image,(catx,caty))
 	catx += 1
 	beep.play()
