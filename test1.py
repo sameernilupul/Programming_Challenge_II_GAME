@@ -1,6 +1,8 @@
 import pygame,sys
 from pygame.locals import *
 from GameObjects import Tank 
+from numpy import *
+from Arena import *
 #Parameters
 
 FPS = 30
@@ -13,6 +15,8 @@ ENEMY_TANK = pygame.image.load('./Resources/Tank2.png')
 GRASS = pygame.image.load('./Resources/Grass.png')
 WATER = pygame.image.load('./Resources/Water.png')
 ROCK = pygame.image.load('./Resources/Rock.png')
+ARENA = getInitialArena()[0]
+PLAYER = getInitialArena()[1]
 
 # initialization
 
@@ -30,6 +34,7 @@ beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
 #pygame.mixer.music.play(-1,0.0)
 
+print ARENA
 #main loop
 while True:
 	DISPLAYSURF.fill(WHITE)

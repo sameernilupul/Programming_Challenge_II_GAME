@@ -1,6 +1,5 @@
 from numpy import *
 
-
 def calculateCoordinates( pos_x, pos_y, width, height):
 	assert pos_x<20 and pos_y <20
 	assert width == height and width % 40 == 0
