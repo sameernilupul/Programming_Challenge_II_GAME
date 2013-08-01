@@ -33,12 +33,8 @@ pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),0,32)
 pygame.display.set_caption('Tank Game')
 
-WHITE = (255,255,255)
-catx =100
-caty =100
 
-Player1 = Tank("My_Tank", 100,0,0,MY_TANK,0)
-TANKS = [Player1,Tank("My_Tank", 100,0,0,ENEMY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,MY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
+TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
@@ -49,8 +45,8 @@ def update(input_string):
 	global TANKS
 	data = input_string.split(':')
 	data[-1] = data[-1][:-1]
-	for i in range(1,NUM_PLAYERS+1):
-		details = data[i].split(';')
+	for i in range(0,NUM_PLAYERS):
+		details = data[i+1].split(';')
 		print details
 		coordinates = details[1].split(',')
 		TANKS[i].pos_x = int(coordinates[0])
