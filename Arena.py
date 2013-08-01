@@ -1,9 +1,8 @@
 from numpy import *
 
-def getInitialArena():
-	file = open('init.txt')
-	data = file.readline().split(':')
-	data[4] = data[4][:-2]
+def getInitialArena(initial_string):
+	data = initial_string.split(':')
+	data[4] = data[4][:-1]
 	arena = zeros(400,dtype('i'))
 	arena.reshape(20,20)
 	object_type = 0
