@@ -6,6 +6,7 @@ from Arena import *
 from Calculations import *
 import thread
 import socket
+from copy import copy, deepcopy
 #Parameters
 
 FPS = 30
@@ -35,6 +36,7 @@ pygame.display.set_caption('Tank Game')
 
 
 TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
+TANKS_PREVIOUS = None
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
@@ -43,6 +45,9 @@ beep = pygame.mixer.Sound('beeps.wav')
 	
 def update(input_string):
 	global TANKS
+	global TANKS_PREV
+	TANKS_PREV = deepcopy(TANKS)
+	
 	data = input_string.split(':')
 	data[-1] = data[-1][:-1]
 	for i in range(0,NUM_PLAYERS):
@@ -58,12 +63,17 @@ def update(input_string):
 		TANKS[i].points = int(details[6])
 		
 		# Change Direction of the image
-		if(TANKS[i].direction == 1):
-			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 90)
-		if(TANKS[i].direction == 2):
-			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 180)
-		if(TANKS[i].direction == 3):
-			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 270)
+		#if(TANKS_PREV[i].direction-TANKS[i].direction == -1):
+		#	TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 90)
+		#if(TANKS[i].direction == 2):
+		#	TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 180)
+		#if(TANKS[i].direction == 3):
+		#	TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 270)
+		
+		angle = TANKS[i].direction - TANKS_PREV[i].direction
+		if(angle == 3 or angle == -3):
+			angle = angle/(-3)
+		TANKS[i].image = pygame.transform.rotate(TANKS[i].image, -90*angle)
 
 # Communication Thread	
 def recieveData():
