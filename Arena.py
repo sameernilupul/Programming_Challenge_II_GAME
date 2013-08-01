@@ -1,4 +1,5 @@
 from numpy import *
+from GameObjects import *
 
 def getInitialArena(initial_string):
 	data = initial_string.split(':')
@@ -19,3 +20,5 @@ def getInitialArena(initial_string):
 			arena[int(coordinate[0])*20 +int(coordinate[1])] = object_type
 	
 	return [arena,data[1]]
+	
+		

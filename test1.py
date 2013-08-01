@@ -13,8 +13,8 @@ WIDTH = 760
 HEIGHT = 760
 fpsClock = pygame.time.Clock()
 NUM_PLAYERS = 5
-MY_TANK = pygame.image.load('./Resources/Tank1.png')
-ENEMY_TANK = pygame.image.load('./Resources/Tank2.png')
+ENEMY_TANK = pygame.image.load('./Resources/Tank1.png')
+MY_TANK = pygame.image.load('./Resources/Tank2.png')
 FALCON = pygame.image.load('./Resources/Falcon.png')
 GRASS = pygame.image.load('./Resources/Grass.png')
 WATER = pygame.image.load('./Resources/Water.png')
@@ -26,7 +26,7 @@ PLAYER = None
 
 data = None
 initialized = 0
-
+updated = 0
 # initialization
 
 pygame.init()
@@ -37,13 +37,37 @@ WHITE = (255,255,255)
 catx =100
 caty =100
 
-Player1 = Tank("Name", 100,0,0,MY_TANK)
+Player1 = Tank("My_Tank", 100,0,0,MY_TANK,0)
+TANKS = [Player1,Tank("My_Tank", 100,0,0,ENEMY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,MY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
 #pygame.mixer.music.play(-1,0.0)
 
-
+	
+def update(input_string):
+	global TANKS
+	data = input_string.split(':')
+	data[-1] = data[-1][:-1]
+	for i in range(1,NUM_PLAYERS+1):
+		details = data[i].split(';')
+		print details
+		coordinates = details[1].split(',')
+		TANKS[i].pos_x = int(coordinates[0])
+		TANKS[i].pos_y = int(coordinates[1])
+		TANKS[i].direction = int(details[2])
+		TANKS[i].shooting = int(details[3])
+		TANKS[i].life = int(details[4])
+		TANKS[i].coins = int(details[5])
+		TANKS[i].points = int(details[6])
+		
+		# Change Direction of the image
+		if(TANKS[i].direction == 1):
+			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 90)
+		if(TANKS[i].direction == 2):
+			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 180)
+		if(TANKS[i].direction == 3):
+			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 270)
 
 # Communication Thread	
 def recieveData():
@@ -65,12 +89,14 @@ def recieveData():
    			ARENA = getInitialArena(data)[0]
    			PLAYER = getInitialArena(data)[1]
    			initialized = 1
+   		elif(data[0] == 'G' and data[1] == ':'):
+   			update(data)
+   			updated = 1
    		c.close()                # Close the connection
 
 #main Loop
 def mainLoop():
 	global initialized
-	global catx
 	init =0;	
 	while True:
 		if(initialized ==1):
@@ -88,9 +114,12 @@ def mainLoop():
 					if ARENA[x*20+y] == 3: 							## Water
 						coordinates = calculateTopLeftCoordinates(x,y, 760,760)
 						DISPLAYSURF.blit(WATER,(coordinates[0],coordinates[1]))
-	
-			DISPLAYSURF.blit(Player1.image,(catx,caty))
-			catx += 1
+			
+			for i in range(0,NUM_PLAYERS):
+				if(TANKS[i].life > 0):
+					coordinates = calculateTopLeftCoordinates(TANKS[i].pos_x,TANKS[i].pos_y,760,760)
+					DISPLAYSURF.blit(TANKS[i].image,(coordinates[0]-10,coordinates[1]-10))
+			
 			beep.play()
 	
 	
