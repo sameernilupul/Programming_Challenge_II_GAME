@@ -10,18 +10,22 @@ from copy import copy, deepcopy
 #Parameters
 
 FPS = 30
-WIDTH = 760
+WIDTH = 1260
 HEIGHT = 760
 fpsClock = pygame.time.Clock()
-NUM_PLAYERS = 5
+NUM_PLAYERS = 1
 ENEMY_TANK = pygame.image.load('./Resources/Tank1.png')
 MY_TANK = pygame.image.load('./Resources/Tank2.png')
 FALCON = pygame.image.load('./Resources/Falcon.png')
 GRASS = pygame.image.load('./Resources/Grass.png')
-WATER = pygame.image.load('./Resources/Water.png')
-STONE = pygame.image.load('./Resources/Rock.png')
-BRICK = pygame.image.load('./Resources/Brick.png')
+WATER = pygame.transform.scale(pygame.image.load('./Resources/Water.png'), (38, 38))
+STONE = pygame.transform.scale(pygame.image.load('./Resources/Rock.png'), (38, 38))
+BRICK = pygame.transform.scale(pygame.image.load('./Resources/Brick.png'), (38, 38))
 COIN = pygame.image.load('./Resources/Coin.png')
+BACKGROUND = pygame.image.load('./Resources/Background.png')
+MENU = pygame.image.load('./Resources/Menu.png')
+SCORE_CARD = pygame.Surface((400,500))  # the size of your rect
+
 ARENA = None
 PLAYER = None
 
@@ -33,7 +37,8 @@ updated = 0
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),0,32)
 pygame.display.set_caption('Tank Game')
-
+SCORE_CARD.set_alpha(128)                # alpha level
+SCORE_CARD.fill((0,0,0))
 
 TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
 TANKS_PREVIOUS = None
@@ -43,46 +48,42 @@ beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.play(-1,0.0)
 
 	
-def update(input_string):
+def update(input_string, case):
 	global TANKS
 	global TANKS_PREV
 	TANKS_PREV = deepcopy(TANKS)
+	print updated
+	if(case == 1):
+		data = input_string.split(':')
+		data[-1] = data[-1][:-1]
+		for i in range(0,NUM_PLAYERS):
+			details = data[i+1].split(';')
+			print details
+			coordinates = details[1].split(',')
+			TANKS[i].pos_x = int(coordinates[0])
+			TANKS[i].pos_y = int(coordinates[1])
+			TANKS[i].direction = int(details[2])
+			TANKS[i].shooting = int(details[3])
+			TANKS[i].life = int(details[4])
+			TANKS[i].coins = int(details[5])
+			TANKS[i].points = int(details[6])
+		
+			angle = TANKS[i].direction - TANKS_PREV[i].direction
+			if(angle == 3 or angle == -3):
+				angle = angle/(-3)
+			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, -90*angle)
 	
-	data = input_string.split(':')
-	data[-1] = data[-1][:-1]
-	for i in range(0,NUM_PLAYERS):
-		details = data[i+1].split(';')
-		print details
-		coordinates = details[1].split(',')
-		TANKS[i].pos_x = int(coordinates[0])
-		TANKS[i].pos_y = int(coordinates[1])
-		TANKS[i].direction = int(details[2])
-		TANKS[i].shooting = int(details[3])
-		TANKS[i].life = int(details[4])
-		TANKS[i].coins = int(details[5])
-		TANKS[i].points = int(details[6])
-		
-		# Change Direction of the image
-		#if(TANKS_PREV[i].direction-TANKS[i].direction == -1):
-		#	TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 90)
-		#if(TANKS[i].direction == 2):
-		#	TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 180)
-		#if(TANKS[i].direction == 3):
-		#	TANKS[i].image = pygame.transform.rotate(TANKS[i].image, 270)
-		
-		angle = TANKS[i].direction - TANKS_PREV[i].direction
-		if(angle == 3 or angle == -3):
-			angle = angle/(-3)
-		TANKS[i].image = pygame.transform.rotate(TANKS[i].image, -90*angle)
-
+	elif(case == 2):
+		data = input_string.split(':')
+	
 # Communication Thread	
 def recieveData():
 	global initialized
 	global ARENA
 	global PLAYER
-	
+	global updated
 	s = socket.socket()         # Create a socket object
-	host = '192.168.1.1' 		# Get local machine name
+	host = '192.168.1.2' 		# Get local machine name
 	port = 12345                # Reserve a port for your service.
 	s.bind((host, port))        # Bind to the port
 	print host
@@ -96,8 +97,11 @@ def recieveData():
    			PLAYER = getInitialArena(data)[1]
    			initialized = 1
    		elif(data[0] == 'G' and data[1] == ':'):
-   			update(data)
+   			update(data,1)
    			updated = 1
+   		elif(data[0] == 'C' and data[1] == ':'):
+   			update(data,2)
+   			updated = 2
    		c.close()                # Close the connection
 
 #main Loop
@@ -105,12 +109,27 @@ def mainLoop():
 	global initialized
 	init =0;	
 	while True:
+		#display menu and background
+		DISPLAYSURF.blit(BACKGROUND,(0,0))
+		DISPLAYSURF.blit(MENU,(760,0))
+		pygame.draw.rect(DISPLAYSURF, (0,0,0), [760, 0, 500, 760], 7)
+		pygame.draw.rect(DISPLAYSURF, (0,0,0), [814,204 , 393, 493], 10)
+		DISPLAYSURF.blit(SCORE_CARD,(810,200))
+		myfont = pygame.font.SysFont("PTSans", 47, True)
+		label = myfont.render("The Battle of Kursk", 10, (255,255,240))
+		DISPLAYSURF.blit(label, (780, 40))
+		
+		myfont = pygame.font.SysFont("PTSans", 25, True)
+		label = myfont.render(" ID   Points   Coins   Health", 10, (255,255,255))
+		DISPLAYSURF.blit(label, (830, 220))
+		#end of displaying menu and background
+		
 		if(initialized ==1):
 			for x in range(0,20):
 				for y in range(0,20):
-					if ARENA[x*20+y] == 0:							## Grass Land
-						coordinates = calculateTopLeftCoordinates(x,y, 760,760)
-						DISPLAYSURF.blit(GRASS,(coordinates[0],coordinates[1]))
+					#if ARENA[x*20+y] == 0:							## Grass Land
+						#coordinates = calculateTopLeftCoordinates(x,y, 760,760)
+						#DISPLAYSURF.blit(GRASS,(coordinates[0],coordinates[1]))
 					if ARENA[x*20+y] == 1: 							## Brick Wall
 						coordinates = calculateTopLeftCoordinates(x,y, 760,760)
 						DISPLAYSURF.blit(BRICK,(coordinates[0],coordinates[1]))
