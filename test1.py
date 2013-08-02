@@ -13,7 +13,7 @@ FPS = 30
 WIDTH = 1260
 HEIGHT = 760
 fpsClock = pygame.time.Clock()
-NUM_PLAYERS = 1
+NUM_PLAYERS = 5
 ENEMY_TANK = pygame.image.load('./Resources/Tank1.png')
 MY_TANK = pygame.image.load('./Resources/Tank2.png')
 FALCON = pygame.image.load('./Resources/Falcon.png')
@@ -24,7 +24,7 @@ BRICK = pygame.transform.scale(pygame.image.load('./Resources/Brick.png'), (38, 
 COIN = pygame.image.load('./Resources/Coin.png')
 BACKGROUND = pygame.image.load('./Resources/Background.png')
 MENU = pygame.image.load('./Resources/Menu.png')
-SCORE_CARD = pygame.Surface((400,500))  # the size of your rect
+SCORE_CARD = pygame.Surface((400,400))  # the size of your rect
 
 ARENA = None
 PLAYER = None
@@ -38,7 +38,6 @@ pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),0,32)
 pygame.display.set_caption('Tank Game')
 SCORE_CARD.set_alpha(150)                # alpha level
-SCORE_CARD.fill((0,0,0))
 
 TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
 TANKS_PREVIOUS = None
@@ -48,12 +47,22 @@ beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.play(-1,0.0)
 
 def updateScorecard():
+	SCORE_CARD.fill((0,0,0))
 	pygame.draw.rect(SCORE_CARD, (0,0,0), [4,4 , 393, 493], 10)
 	myfont = pygame.font.SysFont("PTSans", 25, True)
-	label = myfont.render(" ID   Points   Coins   Health", 20, (255,255,255))
-	SCORE_CARD.blit(label, (30, 20))
+	label = myfont.render("ID    Points    Coins    Health", 20, (255,255,255))
+	SCORE_CARD.blit(label, (15, 20))
 	
-
+	for i in range(0,NUM_PLAYERS):
+		label = myfont.render("  "+str(i), 20, (255,255,255))
+		SCORE_CARD.blit(label, (5, 50*(i+1)+20))
+		label = myfont.render(str(TANKS[i].points), 20, (255,255,255))	
+		SCORE_CARD.blit(label, (80, 50*(i+1)+20))
+		label = myfont.render(str(TANKS[i].coins), 20, (255,255,255))
+		SCORE_CARD.blit(label, (190, 50*(i+1)+20))
+		label = myfont.render(str(TANKS[i].life), 20, (255,255,255))
+		SCORE_CARD.blit(label, (310, 50*(i+1)+20))
+		
 def update(input_string, case):
 	global TANKS
 	global TANKS_PREV
