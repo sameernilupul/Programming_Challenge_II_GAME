@@ -37,7 +37,7 @@ updated = 0
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((WIDTH,HEIGHT),0,32)
 pygame.display.set_caption('Tank Game')
-SCORE_CARD.set_alpha(128)                # alpha level
+SCORE_CARD.set_alpha(150)                # alpha level
 SCORE_CARD.fill((0,0,0))
 
 TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
@@ -47,7 +47,13 @@ beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
 #pygame.mixer.music.play(-1,0.0)
 
+def updateScorecard():
+	pygame.draw.rect(SCORE_CARD, (0,0,0), [4,4 , 393, 493], 10)
+	myfont = pygame.font.SysFont("PTSans", 25, True)
+	label = myfont.render(" ID   Points   Coins   Health", 20, (255,255,255))
+	SCORE_CARD.blit(label, (30, 20))
 	
+
 def update(input_string, case):
 	global TANKS
 	global TANKS_PREV
@@ -113,15 +119,14 @@ def mainLoop():
 		DISPLAYSURF.blit(BACKGROUND,(0,0))
 		DISPLAYSURF.blit(MENU,(760,0))
 		pygame.draw.rect(DISPLAYSURF, (0,0,0), [760, 0, 500, 760], 7)
-		pygame.draw.rect(DISPLAYSURF, (0,0,0), [814,204 , 393, 493], 10)
-		DISPLAYSURF.blit(SCORE_CARD,(810,200))
+		
 		myfont = pygame.font.SysFont("PTSans", 47, True)
 		label = myfont.render("The Battle of Kursk", 10, (255,255,240))
 		DISPLAYSURF.blit(label, (780, 40))
 		
-		myfont = pygame.font.SysFont("PTSans", 25, True)
-		label = myfont.render(" ID   Points   Coins   Health", 10, (255,255,255))
-		DISPLAYSURF.blit(label, (830, 220))
+		updateScorecard()
+		DISPLAYSURF.blit(SCORE_CARD,(810,200))
+		
 		#end of displaying menu and background
 		
 		if(initialized ==1):
