@@ -13,7 +13,7 @@ FPS = 30
 WIDTH = 1260
 HEIGHT = 760
 fpsClock = pygame.time.Clock()
-NUM_PLAYERS = 1
+NUM_PLAYERS = 4
 ENEMY_TANK = pygame.image.load('./Resources/Tank1.png')
 MY_TANK = pygame.image.load('./Resources/Tank2.png')
 FALCON = pygame.image.load('./Resources/Falcon.png')
@@ -21,6 +21,7 @@ GRASS = pygame.image.load('./Resources/Grass.png')
 WATER = pygame.transform.scale(pygame.image.load('./Resources/Water.png'), (38, 38))
 STONE = pygame.transform.scale(pygame.image.load('./Resources/Rock.png'), (38, 38))
 BRICK = pygame.transform.scale(pygame.image.load('./Resources/Brick.png'), (38, 38))
+HEART = pygame.transform.scale(pygame.image.load('./Resources/Heart.png'), (38, 38))
 COIN = pygame.image.load('./Resources/Coin.png')
 BACKGROUND = pygame.image.load('./Resources/Background.png')
 MENU = pygame.image.load('./Resources/Menu.png')
@@ -42,6 +43,7 @@ SCORE_CARD.set_alpha(150)                # alpha level
 TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
 TANKS_PREVIOUS = None
 COINS = []
+HEALTH = []
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
@@ -93,7 +95,12 @@ def update(input_string, case):
 		data[3] = data[3][:-1]
 		coordinates = data[1].split(',')
 		COINS.append(Coins(int(coordinates[0]),int(coordinates[1]),int(data[3]),int(data[2])))
-		
+	
+	if(case ==3):
+		data = input_string.split(':')
+		data[2] = data[2][:-1]
+		coordinates = data[1].split(',')
+		HEALTH.append(Life(int(coordinates[0]),int(coordinates[1]),int(data[2])))
 	
 # Communication Thread	
 def recieveData():
@@ -122,12 +129,19 @@ def recieveData():
    		elif(data[0] == 'C' and data[1] == ':'):
    			update(data,2)
    			updated = 2
+   		elif(data[0] == 'L' and data[1] == ':'):
+   			update(data,3)
+   			updated = 3
    		c.close()                # Close the connection
    		#Reduce life time of coins and health
    		for i in range(0,len(COINS)):
    			print "coin no ="+ str(i)
    			print str(COINS[i].lifetime)
    			COINS[i].lifetime -=1000
+   		for i in range(0,len(HEALTH)):
+   			print "health no ="+ str(i)
+   			print str(HEALTH[i].lifetime)
+   			HEALTH[i].lifetime -=1000
 
 #main Loop
 def mainLoop():
@@ -189,8 +203,27 @@ def mainLoop():
 			print "remove" + str(remove)
 			for i in range(0,len(remove)):
 				coin = COINS.pop(remove[i])
+			
+			# display health
+			remove =[]
+			for i in range(0,len(HEALTH)):
+				if(HEALTH[i].lifetime <= 1000):
+					remove.append(i)
+				life = HEALTH[i]
+				coordinates = calculateTopLeftCoordinates(life.pos_x,life.pos_y,760,760)
+				DISPLAYSURF.blit(HEART,(coordinates[0],coordinates[1]))
 				
-			beep.play()
+			#remove health
+			for i in range(0,NUM_PLAYERS):
+				for j in range(0,len(HEALTH)):
+					if(TANKS[i].pos_x == HEALTH[j].pos_x and TANKS[i].pos_y == HEALTH[j].pos_y):
+						remove.append(j)
+			remove = set(remove)
+			remove = list(remove)
+			print "remove" + str(remove)
+			for i in range(0,len(remove)):
+				coin = HEALTH.pop(remove[i])
+			#beep.play()
 	
 	
 	
