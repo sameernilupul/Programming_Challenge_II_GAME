@@ -177,7 +177,7 @@ def mainLoop():
 					remove.append(i)
 				coin = COINS[i]
 				coordinates = calculateTopLeftCoordinates(coin.pos_x,coin.pos_y,760,760)
-				DISPLAYSURF.blit(COIN,(coordinates[0],coordinates[1]))
+				DISPLAYSURF.blit(COIN,(coordinates[0]-5,coordinates[1]-5))
 				
 			#remove coins
 			for i in range(0,NUM_PLAYERS):
@@ -186,8 +186,10 @@ def mainLoop():
 						remove.append(j)
 			remove = set(remove)
 			remove = list(remove)
+			print "remove" + str(remove)
 			for i in range(0,len(remove)):
 				coin = COINS.pop(remove[i])
+				
 			beep.play()
 	
 	
