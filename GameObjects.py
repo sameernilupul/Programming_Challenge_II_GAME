@@ -38,9 +38,8 @@ class Bullet:
 		self.speed = 3
 		
 class Coins:
-	def __init__(self, pos_x = 0,pos_y = 0, image = None, amount = 0, life_time = 0):
+	def __init__(self, pos_x = 0,pos_y = 0, amount = 0, life_time = 0):
 		self.pos_x = pos_x
 		self.pos_y = pos_y
-		self.image = image
 		self.amount = amount
-		self.lifetime = lifetime
+		self.lifetime = life_time

@@ -13,7 +13,7 @@ FPS = 30
 WIDTH = 1260
 HEIGHT = 760
 fpsClock = pygame.time.Clock()
-NUM_PLAYERS = 5
+NUM_PLAYERS = 1
 ENEMY_TANK = pygame.image.load('./Resources/Tank1.png')
 MY_TANK = pygame.image.load('./Resources/Tank2.png')
 FALCON = pygame.image.load('./Resources/Falcon.png')
@@ -41,6 +41,7 @@ SCORE_CARD.set_alpha(150)                # alpha level
 
 TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0),Tank("Enemy 2", 100,0,0,ENEMY_TANK,0),Tank("Enemy 3", 100,0,0,ENEMY_TANK,0),Tank("Enemy 4", 100,0,0,ENEMY_TANK,0)]
 TANKS_PREVIOUS = None
+COINS = []
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
@@ -67,13 +68,12 @@ def update(input_string, case):
 	global TANKS
 	global TANKS_PREV
 	TANKS_PREV = deepcopy(TANKS)
-	print updated
+	print input_string
 	if(case == 1):
 		data = input_string.split(':')
 		data[-1] = data[-1][:-1]
 		for i in range(0,NUM_PLAYERS):
 			details = data[i+1].split(';')
-			print details
 			coordinates = details[1].split(',')
 			TANKS[i].pos_x = int(coordinates[0])
 			TANKS[i].pos_y = int(coordinates[1])
@@ -87,9 +87,13 @@ def update(input_string, case):
 			if(angle == 3 or angle == -3):
 				angle = angle/(-3)
 			TANKS[i].image = pygame.transform.rotate(TANKS[i].image, -90*angle)
-	
-	elif(case == 2):
+			
+	if(case ==2):
 		data = input_string.split(':')
+		data[3] = data[3][:-1]
+		coordinates = data[1].split(',')
+		COINS.append(Coins(int(coordinates[0]),int(coordinates[1]),int(data[3]),int(data[2])))
+		
 	
 # Communication Thread	
 def recieveData():
@@ -97,6 +101,8 @@ def recieveData():
 	global ARENA
 	global PLAYER
 	global updated
+	global COINS
+	
 	s = socket.socket()         # Create a socket object
 	host = '192.168.1.2' 		# Get local machine name
 	port = 12345                # Reserve a port for your service.
@@ -106,7 +112,6 @@ def recieveData():
 	while True:
    		c, addr = s.accept()     # Establish connection with client.
    		data = c.recv(1024)
-   		print data
    		if(data[0] == 'I'):
    			ARENA = getInitialArena(data)[0]
    			PLAYER = getInitialArena(data)[1]
@@ -118,6 +123,11 @@ def recieveData():
    			update(data,2)
    			updated = 2
    		c.close()                # Close the connection
+   		#Reduce life time of coins and health
+   		for i in range(0,len(COINS)):
+   			print "coin no ="+ str(i)
+   			print str(COINS[i].lifetime)
+   			COINS[i].lifetime -=1000
 
 #main Loop
 def mainLoop():
@@ -154,11 +164,30 @@ def mainLoop():
 						coordinates = calculateTopLeftCoordinates(x,y, 760,760)
 						DISPLAYSURF.blit(WATER,(coordinates[0],coordinates[1]))
 			
+			#display tanks
 			for i in range(0,NUM_PLAYERS):
 				if(TANKS[i].life > 0):
 					coordinates = calculateTopLeftCoordinates(TANKS[i].pos_x,TANKS[i].pos_y,760,760)
 					DISPLAYSURF.blit(TANKS[i].image,(coordinates[0]-10,coordinates[1]-10))
 			
+			#display coins
+			remove =[]
+			for i in range(0,len(COINS)):
+				if(COINS[i].lifetime <= 1000):
+					remove.append(i)
+				coin = COINS[i]
+				coordinates = calculateTopLeftCoordinates(coin.pos_x,coin.pos_y,760,760)
+				DISPLAYSURF.blit(COIN,(coordinates[0],coordinates[1]))
+				
+			#remove coins
+			for i in range(0,NUM_PLAYERS):
+				for j in range(0,len(COINS)):
+					if(TANKS[i].pos_x == COINS[j].pos_x and TANKS[i].pos_y == COINS[j].pos_y):
+						remove.append(j)
+			remove = set(remove)
+			remove = list(remove)
+			for i in range(0,len(remove)):
+				coin = COINS.pop(remove[i])
 			beep.play()
 	
 	
