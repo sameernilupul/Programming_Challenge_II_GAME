@@ -10,6 +10,7 @@ class Tank(object):
 		self.coins = 0
 		self.points = 0
 		self.shooting = 0
+		self.alive = 1
 		
 class BrickWall:
 	def __init__(self, life = 0,pos_x = 0,pos_y = 0, image = None):
@@ -31,10 +32,11 @@ class Water:
 		self.image = image
 		
 class Bullet:
-	def __init__(self, pos_x = 0,pos_y = 0, image = None):
+	def __init__(self, pos_x = 0,pos_y = 0,direction =0,image = None):
 		self.pos_x = pos_x
 		self.pos_y = pos_y
-		self.image = image
+		self.direction = direction
+		self.image =image
 		self.speed = 3
 		
 class Coins:

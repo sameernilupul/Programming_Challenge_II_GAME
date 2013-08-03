@@ -23,6 +23,7 @@ STONE = pygame.transform.scale(pygame.image.load('./Resources/Rock.png'), (38, 3
 BRICK = pygame.transform.scale(pygame.image.load('./Resources/Brick.png'), (38, 38))
 HEART = pygame.transform.scale(pygame.image.load('./Resources/Heart.png'), (38, 38))
 COIN = pygame.image.load('./Resources/Coin.png')
+BULLET = pygame.image.load('./Resources/Bullet.gif')
 BACKGROUND = pygame.image.load('./Resources/Background.png')
 MENU = pygame.image.load('./Resources/Menu.png')
 SCORE_CARD = pygame.Surface((400,400))  # the size of your rect
@@ -44,10 +45,12 @@ TANKS = [Tank("My_Tank", 100,0,0,MY_TANK,0),Tank("Enemy 1", 100,0,0,ENEMY_TANK,0
 TANKS_PREVIOUS = None
 COINS = []
 HEALTH = []
+BULLETS = []
 
 beep = pygame.mixer.Sound('beeps.wav')
 #pygame.mixer.music.load('/Users/sameernilupul/Music/paradise.mp3')
 #pygame.mixer.music.play(-1,0.0)
+
 
 def updateScorecard():
 	SCORE_CARD.fill((0,0,0))
@@ -135,13 +138,24 @@ def recieveData():
    		c.close()                # Close the connection
    		#Reduce life time of coins and health
    		for i in range(0,len(COINS)):
-   			print "coin no ="+ str(i)
-   			print str(COINS[i].lifetime)
    			COINS[i].lifetime -=1000
    		for i in range(0,len(HEALTH)):
-   			print "health no ="+ str(i)
-   			print str(HEALTH[i].lifetime)
    			HEALTH[i].lifetime -=1000
+   		
+   		for i in range(0,NUM_PLAYERS):
+   			if(TANKS[i].shooting ==1):
+   				coordinates = calculateTopLeftCoordinates(TANKS[i].pos_x,TANKS[i].pos_y,760,760)
+   				if(TANKS[i].direction ==0):
+   					bullet_image = BULLET
+   				elif(TANKS[i].direction ==1):
+   					bullet_image = pygame.transform.rotate(BULLET, -90)
+   				elif(TANKS[i].direction ==2):
+   					bullet_image = pygame.transform.rotate(BULLET, 180)
+   				elif(TANKS[i].direction ==3):
+   					bullet_image = pygame.transform.rotate(BULLET, 90)
+   				BULLETS.append(Bullet(coordinates[0],coordinates[1],TANKS[i].direction,bullet_image))  
+   		
+   		
 
 #main Loop
 def mainLoop():
@@ -178,12 +192,6 @@ def mainLoop():
 						coordinates = calculateTopLeftCoordinates(x,y, 760,760)
 						DISPLAYSURF.blit(WATER,(coordinates[0],coordinates[1]))
 			
-			#display tanks
-			for i in range(0,NUM_PLAYERS):
-				if(TANKS[i].life > 0):
-					coordinates = calculateTopLeftCoordinates(TANKS[i].pos_x,TANKS[i].pos_y,760,760)
-					DISPLAYSURF.blit(TANKS[i].image,(coordinates[0]-10,coordinates[1]-10))
-			
 			#display coins
 			remove =[]
 			for i in range(0,len(COINS)):
@@ -200,7 +208,6 @@ def mainLoop():
 						remove.append(j)
 			remove = set(remove)
 			remove = list(remove)
-			print "remove" + str(remove)
 			for i in range(0,len(remove)):
 				coin = COINS.pop(remove[i])
 			
@@ -220,11 +227,29 @@ def mainLoop():
 						remove.append(j)
 			remove = set(remove)
 			remove = list(remove)
-			print "remove" + str(remove)
 			for i in range(0,len(remove)):
 				coin = HEALTH.pop(remove[i])
+				
+			#display bullets
+			for i in range(0,len(BULLETS)):
+				DISPLAYSURF.blit(BULLETS[i].image,(BULLETS[i].pos_x,BULLETS[i].pos_y))
 			#beep.play()
-	
+			#display tanks
+			for i in range(0,NUM_PLAYERS):
+				if(TANKS[i].life > 0):
+					coordinates = calculateTopLeftCoordinates(TANKS[i].pos_x,TANKS[i].pos_y,760,760)
+					DISPLAYSURF.blit(TANKS[i].image,(coordinates[0]-10,coordinates[1]-10))
+					
+			#update Bullets
+			for i in range(0,len(BULLETS)):
+				if(BULLETS[i].direction ==0):
+					BULLETS[i].pos_y -= 12
+				elif(BULLETS[i].direction ==1):
+					BULLETS[i].pos_x += 12
+				elif(BULLETS[i].direction ==2):
+					BULLETS[i].pos_y += 12
+				elif(BULLETS[i].direction ==3):
+					BULLETS[i].pos_x -= 12
 	
 	
 		for event in pygame.event.get():
